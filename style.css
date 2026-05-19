@@ -655,6 +655,7 @@ section { padding: 100px 0; }
 .edu-inst { font-size: 0.82rem; color: var(--muted); margin-bottom: 12px; }
 .edu-score { font-size: 1rem; color: var(--text); }
 .edu-score strong { color: var(--gold); font-size: 1.15rem; }
+.edu-coursework { font-size: 0.78rem; color: var(--muted); margin-top: 8px; line-height: 1.6; }
 
 /* ===== CONTACT ===== */
 .contact-grid {
