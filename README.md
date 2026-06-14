@@ -63,8 +63,4 @@ I built this site with AI-assisted development because the constraint wasn't cod
 
 ## Live Demo
 
-🔗 Live Demo: [Add link here]
-
-## Screenshots
-
-📸 Screenshots: [Add screenshots here]
+🔗 **[kartikeyjaiswal42-sudo.github.io/kartikey-portfolio](https://kartikeyjaiswal42-sudo.github.io/kartikey-portfolio/)**
