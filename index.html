@@ -23,6 +23,7 @@ a:hover{color:var(--warm)}
 @keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
 @keyframes curtain{0%,68%{transform:translateY(0)}100%{transform:translateY(-100%)}}
+@keyframes lineUp{from{transform:translateY(108%)}to{transform:translateY(0)}}
 </style>
 </helmet>
 <div style="font-family:'IBM Plex Sans',system-ui,sans-serif;color:#181510;background:#f4f0e7;overflow-x:hidden;line-height:1.55;-webkit-font-smoothing:antialiased">
@@ -62,7 +63,8 @@ a:hover{color:var(--warm)}
 <section id="hero" style="position:relative;background:#14120d;color:#f4f0e7;min-height:100vh;display:flex;align-items:center;overflow:hidden">
   <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);background-size:64px 64px;mask-image:radial-gradient(ellipse 90% 70% at 60% 40%,#000 40%,transparent 100%);-webkit-mask-image:radial-gradient(ellipse 90% 70% at 60% 40%,#000 40%,transparent 100%)"></div>
   <div style="position:absolute;top:0;bottom:0;left:50%;width:1px;background:linear-gradient(#14120d,rgba(255,255,255,.08),#14120d);transform:translateX(600px)"></div>
-  <div style="position:relative;max-width:1240px;margin:0 auto;padding:120px 40px 60px;width:100%">
+  <canvas id="__field" style="position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;mask-image:radial-gradient(125% 100% at 52% 44%,#000 40%,transparent 82%);-webkit-mask-image:radial-gradient(125% 100% at 52% 44%,#000 40%,transparent 82%)"></canvas>
+  <div style="position:relative;z-index:1;max-width:1240px;margin:0 auto;padding:120px 40px 60px;width:100%">
     <div data-reveal style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;letter-spacing:.34em;text-transform:uppercase;color:var(--warm);margin-bottom:34px;display:flex;align-items:center;gap:14px">
       <span style="width:34px;height:1px;background:var(--warm);display:inline-block"></span>Strategy · Innovation · Execution
     </div>
@@ -90,7 +92,7 @@ a:hover{color:var(--warm)}
 </section>
 
 <div style="background:#14120d;border-top:1px solid rgba(255,255,255,.1);border-bottom:1px solid rgba(255,255,255,.1);overflow:hidden;padding:16px 0">
-  <div style="display:flex;width:max-content;animation:marquee 42s linear infinite;will-change:transform">
+  <div id="__mq" style="display:flex;width:max-content;will-change:transform">
     <sc-for list="{{ ribbon }}" as="r" hint-placeholder-count="2">
       <div style="display:flex;align-items:center;gap:34px;padding-right:34px">
         <sc-for list="{{ r.items }}" as="w" hint-placeholder-count="8">
@@ -206,7 +208,10 @@ a:hover{color:var(--warm)}
     <!-- FEATURED -->
     <div style="display:flex;flex-direction:column;gap:26px;margin-bottom:26px">
       <sc-for list="{{ featured }}" as="p" hint-placeholder-count="3">
-        <div data-reveal style="background:#faf7f0;border:1px solid rgba(24,21,16,.14);padding:44px;transition:box-shadow .3s,transform .3s" style-hover="box-shadow:0 24px 60px -30px rgba(24,21,16,.4);transform:translateY(-3px)">
+        <div data-reveal data-spot style="position:relative;overflow:hidden;background:#faf7f0;border:1px solid rgba(24,21,16,.14);padding:44px;transition:box-shadow .3s,transform .3s,border-color .3s" style-hover="box-shadow:0 24px 60px -30px rgba(24,21,16,.4);transform:translateY(-3px);border-color:rgba(24,21,16,.42)">
+          <div data-glow style="position:absolute;inset:0;z-index:0;opacity:0;transition:opacity .3s;pointer-events:none"></div>
+          <div aria-hidden="true" style="position:absolute;top:-34px;right:26px;z-index:0;font-family:'Newsreader',serif;font-size:200px;line-height:1;color:rgba(24,21,16,.04);pointer-events:none">{{ p.no }}</div>
+          <div style="position:relative;z-index:1">
           <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:20px;flex-wrap:wrap;margin-bottom:24px">
             <div style="display:flex;align-items:baseline;gap:16px">
               <span style="font-family:'Newsreader',serif;font-size:32px;color:rgba(24,21,16,.18);line-height:1">{{ p.no }}</span>
@@ -226,6 +231,7 @@ a:hover{color:var(--warm)}
             <sc-for list="{{ p.tags }}" as="t" hint-placeholder-count="4">
               <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.05em;color:#5b5647;background:#efe9dc;padding:5px 11px;border-radius:2px">{{ t }}</span>
             </sc-for>
+          </div>
           </div>
         </div>
       </sc-for>
@@ -397,9 +403,48 @@ a:hover{color:var(--warm)}
 class Component extends DCLogic {
   state = { active: 'hero' };
 
-  componentDidMount(){ this.applyAccent(); this.initObservers(); this.initProgress(); this.initScope(); this.initLoader(); this.initCursor(); this.initMagnetic(); }
+  componentDidMount(){ this.applyAccent(); this.initObservers(); this.initProgress(); this.initScope(); this.initLoader(); this.initCursor(); this.initMagnetic(); this.initField(); this.initMarquee(); this.initSpotlight(); }
   componentDidUpdate(){ this.applyAccent(); }
-  componentWillUnmount(){ if(this._raf) cancelAnimationFrame(this._raf); if(this._craf) cancelAnimationFrame(this._craf); if(this._onProg) window.removeEventListener('scroll', this._onProg); }
+  componentWillUnmount(){ ['_raf','_craf','_fraf','_mraf'].forEach(k=>{ if(this[k]) cancelAnimationFrame(this[k]); }); if(this._onProg) window.removeEventListener('scroll', this._onProg); }
+
+  initField(){
+    const cv=document.getElementById('__field'); if(!cv) return;
+    const ctx=cv.getContext('2d'); const dpr=Math.min(2,window.devicePixelRatio||1);
+    let pts=[], mx=-9999, my=-9999;
+    const build=()=>{ cv.width=cv.clientWidth*dpr; cv.height=cv.clientHeight*dpr; pts=[]; const gap=46*dpr; for(let x=gap*0.6;x<cv.width;x+=gap){ for(let y=gap*0.6;y<cv.height;y+=gap){ pts.push({x,y,ox:x,oy:y}); } } };
+    build(); window.addEventListener('resize',build,{passive:true});
+    window.addEventListener('mousemove',e=>{ const r=cv.getBoundingClientRect(); mx=(e.clientX-r.left)*dpr; my=(e.clientY-r.top)*dpr; },{passive:true});
+    const draw=()=>{
+      ctx.clearRect(0,0,cv.width,cv.height); const R=140*dpr;
+      for(const p of pts){
+        const dx=p.x-mx, dy=p.y-my; const d=Math.hypot(dx,dy)||0.001;
+        if(d<R){ const f=1-d/R; p.x+=dx/d*f*f*16*dpr; p.y+=dy/d*f*f*16*dpr; }
+        p.x+=(p.ox-p.x)*0.07; p.y+=(p.oy-p.y)*0.07;
+        const near=Math.max(0, 1-d/(150*dpr));
+        if(near>0.12){ ctx.fillStyle='rgba(200,96,46,'+(0.2+near*0.6)+')'; ctx.beginPath(); ctx.arc(p.x,p.y,(1+near*2)*dpr,0,6.283); ctx.fill(); }
+        else { ctx.fillStyle='rgba(230,226,213,'+(0.05+near*0.5)+')'; ctx.beginPath(); ctx.arc(p.x,p.y,1*dpr,0,6.283); ctx.fill(); }
+      }
+      this._fraf=requestAnimationFrame(draw);
+    };
+    draw();
+  }
+
+  initMarquee(){
+    const el=document.getElementById('__mq'); if(!el) return;
+    let x=0, last=window.pageYOffset, vel=0, w=el.scrollWidth/2;
+    window.addEventListener('resize', ()=>{ w=el.scrollWidth/2; }, { passive:true });
+    window.addEventListener('scroll', ()=>{ vel += Math.min(40, Math.abs(window.pageYOffset-last)) * 0.5; last=window.pageYOffset; }, { passive:true });
+    const loop=()=>{ vel*=0.9; x -= (0.6+vel); if(w>0 && -x>=w) x+=w; el.style.transform='translateX('+x+'px)'; this._mraf=requestAnimationFrame(loop); };
+    loop();
+  }
+
+  initSpotlight(){
+    document.querySelectorAll('[data-spot]').forEach(card=>{
+      const glow=card.querySelector('[data-glow]'); if(!glow) return;
+      card.addEventListener('mousemove', e=>{ const r=card.getBoundingClientRect(); glow.style.opacity='1'; glow.style.background='radial-gradient(520px circle at '+(e.clientX-r.left)+'px '+(e.clientY-r.top)+'px, rgba(192,90,42,.1), transparent 60%)'; });
+      card.addEventListener('mouseleave', ()=>{ glow.style.opacity='0'; });
+    });
+  }
 
   initLoader(){
     const num=document.getElementById('__loadnum'), bar=document.getElementById('__loadbar'), ld=document.getElementById('__loader');
