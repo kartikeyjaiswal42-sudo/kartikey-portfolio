@@ -219,8 +219,8 @@ img,canvas,svg,video{max-width:100%}
     <div data-reveal style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.24em;text-transform:uppercase;color:var(--warm);margin-bottom:44px">Evidence — By the Numbers</div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.1)">
       <sc-for list="{{ impact }}" as="m" hint-placeholder-count="5">
-        <div data-reveal style="background:#14120d;padding:34px 26px">
-          <div data-count="{{ m.count }}" data-dec="{{ m.dec }}" data-prefix="{{ m.prefix }}" data-suffix="{{ m.suffix }}" data-sep="1" style="font-family:'Newsreader',serif;font-size:clamp(38px,4.4vw,58px);line-height:.95;color:#fff;letter-spacing:-.01em">{{ m.n }}</div>
+        <div data-reveal style="background:#14120d;padding:34px 20px">
+          <div data-count="{{ m.count }}" data-dec="{{ m.dec }}" data-prefix="{{ m.prefix }}" data-suffix="{{ m.suffix }}" data-sep="1" style="font-family:'Newsreader',serif;font-size:clamp(30px,3.2vw,46px);line-height:.98;color:#fff;letter-spacing:-.015em;overflow-wrap:break-word">{{ m.n }}</div>
           <div style="font-family:'IBM Plex Sans',sans-serif;font-size:13px;color:#b8b2a3;margin-top:16px;line-height:1.5">{{ m.l }}</div>
         </div>
       </sc-for>
